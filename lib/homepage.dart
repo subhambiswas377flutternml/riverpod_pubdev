@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:riverpod_poc/api_service/api_service.dart';
-import 'package:riverpod_poc/models/package_model.dart';
+import 'package:riverpod_poc/controllers/package_controller.dart';
+import 'package:riverpod_poc/states/package_state.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({Key? key}) : super(key: key);
-  static final packageFutureData = FutureProvider((ref) async {
-    List<Package> packageData = await ApiService.getData();
-    return packageData;
-  });
+  static final TextEditingController searchController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final MediaQueryData _info = MediaQuery.of(context);
     final packageDataProvider = ref.watch(packageFutureData);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF12202F),
@@ -29,6 +27,7 @@ class HomePage extends ConsumerWidget {
         bottom: PreferredSize(
           preferredSize: Size(_info.size.width, _info.size.height * 0.05),
           child: TextFormField(
+            controller: searchController,
             decoration: const InputDecoration(
                 filled: true,
                 fillColor: Colors.white,
@@ -36,21 +35,27 @@ class HomePage extends ConsumerWidget {
           ),
         ),
         actions: [
-          // IconButton(
-          //   icon: const Icon(Icons.search),
-          //   onPressed: () {},
-          // )
+          IconButton(
+            onPressed: (){
+              ref.read(packageFutureData.notifier).searchApi(keyWord: searchController.text.trim());
+            },
+            icon: const Icon(Icons.search),
+          ),
         ],
       ),
-      body: packageDataProvider.when(data: (data) {
-        return ListView.separated(
+      body: 
+      
+      
+      
+      packageDataProvider is LoadingState ? const Center(child: CircularProgressIndicator())
+          :ListView.separated(
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.symmetric(
             horizontal: _info.size.width * 0.01,
             vertical: _info.size.height * 0.02,
           ),
           shrinkWrap: true,
-          itemCount: data.length,
+          itemCount: (packageDataProvider as LoadedState).allPackageData.length,
           itemBuilder: (_, index) {
             return InkWell(
               onTap: () {},
@@ -65,7 +70,7 @@ class HomePage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          data[index].packageName.toString(),
+                          packageDataProvider.allPackageData[index].packageName.toString(),
                           style: TextStyle(
                             fontSize: _info.textScaleFactor * 16,
                             color: Colors.blue,
@@ -75,7 +80,7 @@ class HomePage extends ConsumerWidget {
                         SizedBox(
                           height: _info.size.height * 0.01,
                         ),
-                        Text(data[index].packageDescription.toString()),
+                        Text(packageDataProvider.allPackageData[index].packageDescription.toString()),
                       ],
                     ),
                   )),
@@ -86,14 +91,10 @@ class HomePage extends ConsumerWidget {
               height: _info.size.height * 0.01,
             );
           },
-        );
-      }, error: (e, _) {
-        return const Center(child: Text("Something Went Wrong !"));
-      }, loading: () {
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }),
+        
+          ),
+        
+      
     );
   }
 }
