@@ -1,11 +1,12 @@
-class Package {
-  String? packageName;
-  String? packageDescription;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  Package({required this.packageDescription, required this.packageName});
+part 'package_model.freezed.dart';
+part 'package_model.g.dart';
 
-  factory Package.fromJson(Map<String, dynamic> data) {
-    return Package(
-        packageName: data["name"], packageDescription: data["description"]);
-  }
+@freezed
+class Package with _$Package{
+
+  factory Package({required String packageName, required String packageDescription}) = _Package;
+
+  factory Package.fromJson(Map<String, dynamic> data) => _$PackageFromJson(data);
 }

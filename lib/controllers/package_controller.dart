@@ -17,7 +17,7 @@ class PackageController extends StateNotifier<PackageState>
   void searchApi({required String keyWord})async{
     List<Package> allData = (state as LoadedState).allPackageData;
     state = LoadingState();
-    List<Package> modifiedPackage = allData.where((element)=>element.packageName!.contains(keyWord)).toList();
+    List<Package> modifiedPackage = allData.where((element)=>element.packageName.contains(keyWord)).toList();
     state = LoadedState(allPackageData: modifiedPackage);
   }
 }

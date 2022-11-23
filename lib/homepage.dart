@@ -43,11 +43,7 @@ class HomePage extends ConsumerWidget {
           ),
         ],
       ),
-      body: 
-      
-      
-      
-      packageDataProvider is LoadingState ? const Center(child: CircularProgressIndicator())
+      body: packageDataProvider is LoadingState ? const Center(child: CircularProgressIndicator())
           :ListView.separated(
           physics: const BouncingScrollPhysics(),
           padding: EdgeInsets.symmetric(
